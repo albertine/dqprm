@@ -10,15 +10,30 @@ def parse():
     parser.add_argument("fichier", help="indiquer le nom du fichier", type=str)
     return parser.parse_args()
 
-def do_it(*arg):
-    with open(*arg, "r") as f:
+def extract_SUV(chaine):
+    m = re.findall("(M.*)(?<!RC)SUVValue = (\d+\.\d+)",chaine, re.M)
+    return m
+
+def extract_HU(chaine):
+    m = re.findall("(M.*)HUValue = (\d+(\.\d+)?)",chaine, re.M)
+    return m
+
+def ouverture_fichier(fic):
+    with open(fic, "r") as f:
         lines = f.read()
+    return lines
 
-        m = re.findall("(M.*)(?<!RC)SUVValue = (\d+\.\d+)",lines, re.M)
+def sortie_resultat(data):
+    return {el[0]:float(el[1]) for el in data}
 
-        d = {el[0]:float(el[1]) for el in m}
-        print(d)
+def do_it(fic):
+    lines = ouverture_fichier(fic)
+    suv = extract_SUV(lines)
+    hu = extract_HU(lines)
+    d = sortie_resultat(suv)
+    e = sortie_resultat(hu)
+    print(d,e)
 
 if __name__ == "__main__":
-    arg = parse()
-    do_it(arg.fichier)
+    p = parse()
+    do_it(p.fichier)
